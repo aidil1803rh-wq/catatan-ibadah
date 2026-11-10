@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Catatan Ibadah Pekanan</title>
+<style>
+:root{--bg:#f3f6f4;--card:#fff;--ink:#16302b;--mut:#5c726c;--line:#d5e0dc;--ac:#0f6b5c;--acink:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1816;--card:#16251f;--ink:#e6f1ee;--mut:#9ab3ac;--line:#2a3f38;--ac:#4cc3ad;--acink:#06201b}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Segoe UI",system-ui,sans-serif}
+main{max-width:560px;margin:0 auto;padding:16px}
+h1{font-size:1.4rem;margin:8px 0 2px}
+h2{font-size:1.05rem;margin:0 0 10px}
+p.s{color:var(--mut);margin:0 0 16px;font-size:.92rem}
+section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px}
+label.f{display:block;font-size:.88rem;color:var(--mut);margin:10px 0 4px}
+input[type=text],input[type=number],input[type=date]{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px}
+.ck{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.ck input{width:22px;height:22px;accent-color:var(--ac)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+button{font:inherit;border:0;border-radius:8px;padding:10px 14px;background:var(--ac);color:var(--acink);cursor:pointer}
+button.g{background:transparent;color:var(--ac);border:1px solid var(--ac);padding:6px 12px}
+button:focus-visible,input:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.cp{display:flex;gap:8px;align-items:flex-start;border-top:1px solid var(--line);padding:10px 0}
+.cp div{flex:1;min-width:0}
+.cp small{color:var(--mut);display:block}
+.cp .v{word-break:break-word;white-space:pre-wrap}
+.wn{color:#b3261e;font-size:.85rem}
+#t{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:20px;opacity:0;transition:opacity .2s;pointer-events:none}
+#t.on{opacity:1}
+</style>
+</head>
+<body>
+<main>
+<h1>Catatan Ibadah Pekanan</h1>
+<p class="s">Centang tiap hari. Di akhir pekan, semua dijumlah jadi isian form.</p>
+
+<section>
+<h2>Catatan hari ini</h2>
+<label class="f" for="d">Tanggal</label><input type="date" id="d">
+<div class="two">
+<div><label class="f" for="wj">Wajib berjamaah di masjid (maks 5)</label><input type="number" id="wj" min="0" max="5" inputmode="numeric"></div>
+<div><label class="f" for="rw">Rawatib (maks 7)</label><input type="number" id="rw" min="0" max="7" inputmode="numeric"></div>
+</div>
+<label class="f" for="qh">Membaca Al Quran (halaman)</label><input type="number" id="qh" min="0" inputmode="numeric">
+<label class="f" for="hs">Menghafal: nama surat</label><input type="text" id="hs" list="sr" placeholder="Kosongkan jika tidak menghafal"><datalist id="sr"></datalist>
+<div class="two"><div><label class="f" for="ha">Dari ayat</label><input type="number" id="ha" min="1" inputmode="numeric"></div><div><label class="f" for="hb">Sampai ayat</label><input type="number" id="hb" min="1" inputmode="numeric"></div></div>
+<div style="margin-top:10px">
+<label class="ck"><input type="checkbox" id="dh">Sunnah Dhuha</label>
+<label class="ck"><input type="checkbox" id="tj">Tahajjud</label>
+<label class="ck"><input type="checkbox" id="ps">Puasa sunnah</label>
+<label class="ck"><input type="checkbox" id="if">Infak/sedekah</label>
+<label class="ck"><input type="checkbox" id="mp">Al Ma’tsurat pagi</label>
+<label class="ck"><input type="checkbox" id="mt">Al Ma’tsurat petang</label>
+<label class="ck"><input type="checkbox" id="sm">Like, share, comment media sosial PKS</label>
+</div>
+<div class="row"><button id="save">Simpan hari ini</button></div>
+<p class="s" id="info" style="margin:10px 0 0"></p>
+</section>
+
+<section>
+<h2>Isian form sepekan</h2>
+<label class="f" for="ed">Hitung 7 hari sampai tanggal</label><input type="date" id="ed">
+<div class="row"><button id="gen">Jumlahkan pekan ini</button></div>
+<div id="out"></div>
+</section>
+</main>
+<div id="t" role="status"></div>
+<script>
+var FORM="https://docs.google.com/forms/d/e/1FAIpQLSezRWXHbDq-MYcUiOu9NcV2eyte1C1oJFA91I_Zkw_gKesB3w/viewform";
+var $=function(i){return document.getElementById(i)};
+var D={};
+var SR="Al-Fatihah,Al-Baqarah,Ali Imran,An-Nisa',Al-Ma'idah,Al-An'am,Al-A'raf,Al-Anfal,At-Taubah,Yunus,Hud,Yusuf,Ar-Ra'd,Ibrahim,Al-Hijr,An-Nahl,Al-Isra',Al-Kahfi,Maryam,Thaha,Al-Anbiya',Al-Hajj,Al-Mu'minun,An-Nur,Al-Furqan,Asy-Syu'ara',An-Naml,Al-Qashash,Al-'Ankabut,Ar-Rum,Luqman,As-Sajdah,Al-Ahzab,Saba',Fathir,Yasin,Ash-Shaffat,Shad,Az-Zumar,Ghafir,Fushshilat,Asy-Syura,Az-Zukhruf,Ad-Dukhan,Al-Jatsiyah,Al-Ahqaf,Muhammad,Al-Fath,Al-Hujurat,Qaf,Adz-Dzariyat,Ath-Thur,An-Najm,Al-Qamar,Ar-Rahman,Al-Waqi'ah,Al-Hadid,Al-Mujadilah,Al-Hasyr,Al-Mumtahanah,Ash-Shaff,Al-Jumu'ah,Al-Munafiqun,At-Taghabun,Ath-Thalaq,At-Tahrim,Al-Mulk,Al-Qalam,Al-Haqqah,Al-Ma'arij,Nuh,Al-Jinn,Al-Muzzammil,Al-Muddatstsir,Al-Qiyamah,Al-Insan,Al-Mursalat,An-Naba',An-Nazi'at,'Abasa,At-Takwir,Al-Infithar,Al-Muthaffifin,Al-Insyiqaq,Al-Buruj,Ath-Thariq,Al-A'la,Al-Ghasyiyah,Al-Fajr,Al-Balad,Asy-Syams,Al-Lail,Adh-Dhuha,Asy-Syarh,At-Tin,Al-'Alaq,Al-Qadr,Al-Bayyinah,Az-Zalzalah,Al-'Adiyat,Al-Qari'ah,At-Takatsur,Al-'Ashr,Al-Humazah,Al-Fil,Quraisy,Al-Ma'un,Al-Kautsar,Al-Kafirun,An-Nashr,Al-Lahab,Al-Ikhlas,Al-Falaq,An-Nas".split(",");
+SR.forEach(function(n){var o=document.createElement("option");o.value=n;$("sr").appendChild(o)});
+try{var r=localStorage.getItem("ibadah");if(r)D=JSON.parse(r)||{}}catch(e){}
+function persist(){try{localStorage.setItem("ibadah",JSON.stringify(D))}catch(e){}}
+function iso(dt){var z=new Date(dt.getTime()-dt.getTimezoneOffset()*6e4);return z.toISOString().slice(0,10)}
+function toast(m){var t=$("t");t.textContent=m;t.className="on";setTimeout(function(){t.className=""},1400)}
+var CK=["dh","tj","ps","if","mp","mt","sm"];
+$("d").value=iso(new Date());$("ed").value=iso(new Date());
+function load(){
+  var x=D[$("d").value]||{};
+  $("wj").value=x.wj||"";$("rw").value=x.rw||"";$("qh").value=x.qh||"";$("hs").value=x.hs||"";$("ha").value=x.ha||"";$("hb").value=x.hb||"";
+  CK.forEach(function(k){$(k).checked=!!x[k]});
+  $("info").textContent=D[$("d").value]?"Tanggal ini sudah tercatat. Simpan lagi untuk memperbarui.":"";
+}
+$("d").onchange=load;load();
+function doSave(q){
+  var x={wj:Math.min(5,+$("wj").value||0),rw:Math.min(7,+$("rw").value||0),qh:+$("qh").value||0,hs:$("hs").value.trim(),ha:+$("ha").value||0,hb:+$("hb").value||0};
+  CK.forEach(function(k){x[k]=$(k).checked});
+  D[$("d").value]=x;persist();if(!q){load();toast("Tersimpan")}else{$("info").textContent="Tersimpan otomatis."}
+}
+$("save").onclick=function(){doSave(false)};
+["wj","rw","qh","hs","ha","hb"].forEach(function(k){$(k).addEventListener("input",function(){doSave(true)})});
+CK.forEach(function(k){$(k).addEventListener("change",function(){doSave(true)})});
+function cp(txt){
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){toast("Tersalin")},function(){fb(txt)})}else fb(txt);
+}
+function fb(txt){var a=document.createElement("textarea");a.value=txt;document.body.appendChild(a);a.select();try{document.execCommand("copy");toast("Tersalin")}catch(e){toast("Gagal menyalin")}a.remove()}
+$("gen").onclick=function(){
+  var end=new Date($("ed").value+"T00:00:00");if(isNaN(end)){toast("Pilih tanggal");return}
+  var n=0,s={wj:0,rw:0,qh:0,dh:0,tj:0,ps:0,if:0,mp:0,mt:0,sm:0},hf=[];
+  for(var i=6;i>=0;i--){
+    var t=new Date(end);t.setDate(t.getDate()-i);var x=D[iso(t)];if(!x)continue;n++;
+    s.wj+=x.wj||0;s.rw+=x.rw||0;s.qh+=x.qh||0;
+    ["dh","tj","ps","if","mp","mt","sm"].forEach(function(k){if(x[k])s[k]++});
+    if(x.hs){var a1=x.ha||1,b1=x.hb||a1,l=hf[hf.length-1];if(l&&l.n===x.hs&&a1<=l.b+1){l.b=Math.max(l.b,b1)}else hf.push({n:x.hs,a:a1,b:b1})}
+  }
+  var f=[
+   ["Shalat Wajib (angka saja, maks 35)",String(s.wj)],
+   ["Shalat Sunnah Rawatib (angka saja, maks 49)",String(s.rw)],
+   ["Membaca Al Quran (jumlah halaman)",String(s.qh)],
+   ["Menghafal Al Quran (surat dan ayatnya)",hf.length?hf.map(function(h){return h.n+" ayat "+h.a+(h.b>h.a?"-"+h.b:"")}).join("; "):"-"],
+   ["Shalat Sunnah Dhuha (pilih di form)","Pilih "+s.dh],
+   ["Shalat Tahajjud (pilih di form)","Pilih "+s.tj],
+   ["Puasa Sunnah (pilih di form)","Pilih "+(s.ps>3?"> 3":s.ps)],
+   ["Infak/Sedekah harian (pilih di form)","Pilih "+s.if],
+   ["Al Ma’tsurat pagi (pilih di form)","Pilih "+s.mp],
+   ["Al Ma’tsurat petang (pilih di form)","Pilih "+s.mt],
+   ["Like, share, comment media sosial PKS",s.sm>0?"Ada ("+s.sm+" hari)":"Tidak Ada"]
+  ];
+  var h='<p class="s" style="margin-top:12px">'+n+' dari 7 hari sudah tercatat.'+(n<7?' <span class="wn">Hari yang kosong dihitung nol.</span>':'')+'</p>';
+  f.forEach(function(x,i){h+='<div class="cp"><div><small></small><div class="v"></div></div><button class="g" data-i="'+i+'">Salin</button></div>'});
+  h+='<div class="row"><a href="'+FORM+'" target="_blank" rel="noopener"><button type="button">Buka form</button></a></div>';
+  var o=$("out");o.innerHTML=h;
+  var sm=o.querySelectorAll("small"),vs=o.querySelectorAll(".v");
+  f.forEach(function(x,i){sm[i].textContent=x[0];vs[i].textContent=x[1]});
+  o.onclick=function(e){var i=e.target.getAttribute&&e.target.getAttribute("data-i");if(i!==null&&i!==undefined)cp(f[+i][1].replace(/^Pilih /,"").replace(/^Ada \((\d+) hari\)$/,"Ada"))};
+};
+</script>
+</body>
+</html>
